@@ -6,7 +6,7 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 const Filter = require('bad-words')
-const { generateMessage } = require('./utils/messages')
+const { generateMessage, generateLocationMessage } = require('./utils/messages')
 const port = process.env.PORT || 3008;
 
 const publicDirectoryPath = path.join(__dirname, '../public');
@@ -26,14 +26,13 @@ io.on('connection', (socket) => {
             return callback('Profanity is not allowed')
         }
 
-        io.emit(generateMessage('message'), message)
+        io.emit('message', generateMessage(message))
         callback('Delivered')
     })
 
     socket.on('sendLocation', (coords, callback) => {
-        io.emit('locationMessage', generateMessage(`https://www.google.com/maps?q=${coords.latitude},${coords.longtitude}`))
+        io.emit('locationMessage', generateLocationMessage(`https://www.google.com/maps?q=${coords.latitude},${coords.longtitude}`))
         callback()
-
     })
 
     socket.on('disconnect', () => {
